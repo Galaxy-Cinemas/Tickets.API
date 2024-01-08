@@ -1,9 +1,12 @@
 using System.Reflection;
+using Galaxi.Tickets.Domain.Profiles;
 using Galaxi.Tickets.Persistence;
 using Galaxi.Tickets.Persistence.Persistence;
 
 //using Galaxi.Tickets.Domain.Profiles;
 using Galaxi.Tickets.Persistence.Repositorys;
+using MassTransit;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,11 +15,20 @@ var builder = WebApplication.CreateBuilder(args);
 var service = builder.Services.BuildServiceProvider();
 var configuration = service.GetService<IConfiguration>();
 
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingAzureServiceBus((context, cfg) =>
+    {
+        cfg.Host(configuration.GetConnectionString("AzureServiceBus"));
+
+        cfg.ConfigureEndpoints(context);
+    });
+});
 
 builder.Services.AddInfrastructure(configuration);
-//builder.Services.AddAutoMapper(typeof(MovieProfile).Assembly);
+builder.Services.AddAutoMapper(typeof(TicketProfile).Assembly);
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
-//builder.Services.AddMediatR(Assembly.Load("Galaxi.Movie.Domain"));
+builder.Services.AddMediatR(Assembly.Load("Galaxi.Tickets.Domain"));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

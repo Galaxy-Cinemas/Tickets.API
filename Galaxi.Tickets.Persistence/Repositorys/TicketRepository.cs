@@ -1,11 +1,6 @@
 ﻿using Galaxi.Tickets.Data.Models;
 using Galaxi.Tickets.Persistence.Persistence;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Galaxi.Tickets.Persistence.Repositorys
 {

@@ -1,13 +1,10 @@
 ﻿using AutoMapper;
+using Galaxi.Bus.Message;
 using Galaxi.Tickets.Data.Models;
 using Galaxi.Tickets.Domain.Infrastructure.Commands;
 using Galaxi.Tickets.Persistence.Repositorys;
+using MassTransit;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Galaxi.Tickets.Domain.Handlers
 {
@@ -16,18 +13,25 @@ namespace Galaxi.Tickets.Domain.Handlers
     {
         private readonly ITicketRepository _repo;
         private readonly IMapper _mapper;
-        public CreatedTicketHandler(ITicketRepository repo, IMapper mapper)
+        private readonly IBus _bus;
+
+        public CreatedTicketHandler(ITicketRepository repo, IMapper mapper, IBus bus)
         {
             _repo = repo;
             _mapper = mapper;
+            _bus = bus;
         }
         public async Task<bool> Handle(CreatedTicketCommand request, CancellationToken cancellationToken)
         {
-            var createdMovie = _mapper.Map<Ticket>(request);
+            Ticket createdMovie = _mapper.Map<Ticket>(request);
 
             _repo.Add(createdMovie);
 
-            return await _repo.SaveAll();
+            var created = await _repo.SaveAll();
+
+            await _bus.Publish(new TickedCreated(createdMovie.FunctionId));
+
+            return created;
         }
     }
 }
