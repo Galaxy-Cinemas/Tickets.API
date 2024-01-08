@@ -7,11 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Repositorys\" />
-    <Folder Include="Persistence\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Galaxi.Tickets.Data\Galaxi.Tickets.Data.csproj" />
   </ItemGroup>
 
