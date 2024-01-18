@@ -10,7 +10,12 @@ namespace Galaxi.Tickets.Persistence.Configurations
         {
             builder
                 .ToTable("Ticket", "DBO")
-                .HasKey(x => new { x.Id });
+                .HasKey(x => new { x.TicketId });
+
+            builder.Property(x => x.UserName).IsRequired();
+            builder.Property(x => x.AdditionalPrice).IsRequired().HasColumnType("decimal(18, 2)");
+            builder.Property(x => x.UserName).IsRequired();
+            builder.Property(x => x.UserName).IsRequired();
         }
     }
 }

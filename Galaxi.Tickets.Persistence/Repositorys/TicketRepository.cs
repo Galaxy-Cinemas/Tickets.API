@@ -29,7 +29,7 @@ namespace Galaxi.Tickets.Persistence.Repositorys
 
         public async Task<Ticket> GetTicketById(int id)
         {
-            var ticket = await _context.Ticket.FirstOrDefaultAsync(u => u.Id == id);
+            var ticket = await _context.Ticket.FirstOrDefaultAsync(u => u.TicketId == id);
             return ticket;
         }
 

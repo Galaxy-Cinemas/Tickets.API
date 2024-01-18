@@ -2,9 +2,10 @@
 {
     public class Ticket
     {
-        public int Id { get; set; }
+        public int TicketId { get; set; }
         public int FunctionId { get; set; }
-        public Decimal AdditionalPrice { get; set; }
-        public string? UserName { get; set; }
+        public decimal AdditionalPrice { get; set; } = 0;
+        public string UserName { get; set; }
+        public int NumSeats { get; set; } = 1;
     }
 }

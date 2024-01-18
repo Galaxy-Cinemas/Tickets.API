@@ -14,6 +14,7 @@
   <ItemGroup>
     <Folder Include="DTOs\" />
     <Folder Include="Infrastructure\Queries\" />
+    <Folder Include="IntegrationEvents\Consumers\" />
   </ItemGroup>
 
   <ItemGroup>

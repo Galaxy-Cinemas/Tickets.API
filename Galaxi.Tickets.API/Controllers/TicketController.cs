@@ -21,6 +21,7 @@ namespace Galaxi.Tickets.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreatedTicketCommand ticketToCreate)
         {
+            var Email = HttpContext.Request.Headers["email"];
             var created = await _mediator.Send(ticketToCreate);
             if (created)
                 return Ok(ticketToCreate);
