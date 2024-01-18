@@ -5,6 +5,7 @@ using Galaxi.Tickets.Domain.Infrastructure.Commands;
 using Galaxi.Tickets.Persistence.Repositorys;
 using MassTransit;
 using MediatR;
+using System.Net.Http;
 
 namespace Galaxi.Tickets.Domain.Handlers
 {
@@ -29,7 +30,12 @@ namespace Galaxi.Tickets.Domain.Handlers
 
             var created = await _repo.SaveAll();
 
-            await _bus.Publish(new TickedCreated(createdMovie.FunctionId));
+            await _bus.Publish(new TickedCreated
+            {
+                FunctionId = createdMovie.FunctionId,
+                NumSeat = createdMovie.NumSeats,
+                //Email = HttpContext.Request.Headers["Email"]
+            });
 
             return created;
         }

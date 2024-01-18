@@ -23,22 +23,26 @@ namespace Galaxi.Tickets.Persistence.Migrations
 
             modelBuilder.Entity("Galaxi.Tickets.Data.Models.Ticket", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("TicketId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TicketId"));
 
                     b.Property<decimal>("AdditionalPrice")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18, 2)");
 
                     b.Property<int>("FunctionId")
                         .HasColumnType("int");
 
+                    b.Property<int>("NumSeats")
+                        .HasColumnType("int");
+
                     b.Property<string>("UserName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("TicketId");
 
                     b.ToTable("Ticket", "DBO");
                 });
