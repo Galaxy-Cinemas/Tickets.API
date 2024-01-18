@@ -1,10 +1,13 @@
 ﻿using Galaxi.Tickets.Domain.Infrastructure.Commands;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Galaxi.Tickets.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Route("v1/[controller]/[action]")]
     [ApiController]
     public class TicketController : ControllerBase
     {
