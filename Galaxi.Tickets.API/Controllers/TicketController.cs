@@ -21,6 +21,22 @@ namespace Galaxi.Tickets.API.Controllers
             _log = log;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            try
+            {
+                _log.LogInformation("Get all tickets");
+                var tickets = await _mediator.Send(new GetAllTicketQuery());
+                return Ok(tickets);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
+            }
+        }
+
+
         [HttpPost]
         public async Task<IActionResult> Create(CreatedTicketCommand ticketToCreate)
         {
