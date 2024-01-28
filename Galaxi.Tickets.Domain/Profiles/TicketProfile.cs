@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Galaxi.Tickets.Data.Models;
+using Galaxi.Tickets.Domain.DTOs;
 using Galaxi.Tickets.Domain.Infrastructure.Commands;
 
 namespace Galaxi.Tickets.Domain.Profiles
@@ -9,6 +10,9 @@ namespace Galaxi.Tickets.Domain.Profiles
         public TicketProfile()
         {
             CreateMap<CreatedTicketCommand, Ticket>();
+            CreateMap<Ticket, TicketDto>();
+
+
         }
     }
 }
