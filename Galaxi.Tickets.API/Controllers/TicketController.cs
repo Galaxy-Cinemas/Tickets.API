@@ -1,9 +1,16 @@
-﻿using Galaxi.Tickets.Domain.Infrastructure.Commands;
+﻿using Galaxi.Tickets.Data.Models;
+using Galaxi.Tickets.Domain.DTOs;
+using Galaxi.Tickets.Domain.Infrastructure.Commands;
 using Galaxi.Tickets.Domain.Infrastructure.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text.Json;
+using Newtonsoft.Json;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Galaxi.Tickets.API.Controllers
 {
@@ -40,10 +47,32 @@ namespace Galaxi.Tickets.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreatedTicketCommand ticketToCreate)
         {
-            var Email = HttpContext.Request.Headers["email"];
-            var created = await _mediator.Send(ticketToCreate);
+            string Authorization = HttpContext.Request.Headers["Authorization"];
+            var Token = Authorization.Remove(0, 7);
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            // Lee y valida el token JWT
+            var token = tokenHandler.ReadJwtToken(Token);
+
+            // Accede a la carga útil (payload)
+            var payload = token.Payload;
+
+            // Serializa la carga útil a una instancia de JwtPayload
+            var jsonPayload = JsonConvert.SerializeObject(payload);
+            TokenUserInfo jwtPayload = JsonConvert.DeserializeObject<TokenUserInfo>(jsonPayload);
+
+            CreatedTicketCommand newCreateTicket = new CreatedTicketCommand
+                (
+                FunctionId: ticketToCreate.FunctionId,
+                AdditionalPrice: ticketToCreate.AdditionalPrice,
+                UserName: jwtPayload.email,
+                NumSeats: ticketToCreate.NumSeats
+                );
+
+        var created = await _mediator.Send(newCreateTicket);
             if (created)
-                return Ok(ticketToCreate);
+                return Ok(newCreateTicket);
 
             return BadRequest();
         }
