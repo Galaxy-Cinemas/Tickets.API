@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text;
 using Galaxi.Tickets.Domain.Profiles;
+using Galaxi.Tickets.Domain.Services;
 using Galaxi.Tickets.Persistence;
 using Galaxi.Tickets.Persistence.Persistence;
 using Galaxi.Tickets.Persistence.Repositorys;
@@ -29,6 +30,7 @@ builder.Services.AddMassTransit(x =>
 builder.Services.AddInfrastructure(configuration);
 builder.Services.AddAutoMapper(typeof(TicketProfile).Assembly);
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
+builder.Services.AddScoped<ITicketServices, TicketServices>();
 builder.Services.AddMediatR(Assembly.Load("Galaxi.Tickets.Domain"));
 
 // Add Authentication

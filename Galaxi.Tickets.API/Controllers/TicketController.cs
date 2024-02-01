@@ -11,6 +11,8 @@ using System.Text.Json;
 using Newtonsoft.Json;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Galaxi.Tickets.Domain.Services;
+using System.Net;
 
 namespace Galaxi.Tickets.API.Controllers
 {
@@ -20,11 +22,13 @@ namespace Galaxi.Tickets.API.Controllers
     public class TicketController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly ITicketServices _serviceTicket;
         private readonly ILogger<TicketController> _log;
 
-        public TicketController(ILogger<TicketController> log,  IMediator mediator)
+        public TicketController(ILogger<TicketController> log,  IMediator mediator, ITicketServices serviceTicket)
         {
             _mediator = mediator;
+            _serviceTicket = serviceTicket;
             _log = log;
         }
 
@@ -33,6 +37,8 @@ namespace Galaxi.Tickets.API.Controllers
         {
             try
             {
+                string Authorization = HttpContext.Request.Headers["Authorization"];
+                TokenUserInfo jwtPayload = _serviceTicket.DeserealizeToken(Authorization);
                 _log.LogInformation("Get all tickets");
                 var tickets = await _mediator.Send(new GetAllTicketQuery());
                 return Ok(tickets);
@@ -43,24 +49,12 @@ namespace Galaxi.Tickets.API.Controllers
             }
         }
 
-
         [HttpPost]
         public async Task<IActionResult> Create(CreatedTicketCommand ticketToCreate)
         {
             string Authorization = HttpContext.Request.Headers["Authorization"];
-            var Token = Authorization.Remove(0, 7);
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-
-            // Lee y valida el token JWT
-            var token = tokenHandler.ReadJwtToken(Token);
-
-            // Accede a la carga útil (payload)
-            var payload = token.Payload;
-
-            // Serializa la carga útil a una instancia de JwtPayload
-            var jsonPayload = JsonConvert.SerializeObject(payload);
-            TokenUserInfo jwtPayload = JsonConvert.DeserializeObject<TokenUserInfo>(jsonPayload);
+            TokenUserInfo jwtPayload = _serviceTicket.DeserealizeToken(Authorization);
 
             CreatedTicketCommand newCreateTicket = new CreatedTicketCommand
                 (
@@ -70,13 +64,12 @@ namespace Galaxi.Tickets.API.Controllers
                 NumSeats: ticketToCreate.NumSeats
                 );
 
-        var created = await _mediator.Send(newCreateTicket);
+            var created = await _mediator.Send(newCreateTicket);
             if (created)
                 return Ok(newCreateTicket);
 
             return BadRequest();
         }
-
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
