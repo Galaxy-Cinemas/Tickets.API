@@ -10,6 +10,7 @@ namespace Galaxi.Tickets.Domain.Profiles
         public TicketProfile()
         {
             CreateMap<CreatedTicketCommand, Ticket>();
+            CreateMap<CreatedTicketCommand, TicketDto>();
             CreateMap<Ticket, TicketDto>();
 
 

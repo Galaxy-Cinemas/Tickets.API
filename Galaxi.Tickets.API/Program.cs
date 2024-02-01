@@ -1,5 +1,9 @@
 using System.Reflection;
 using System.Text;
+using FluentValidation;
+using Galaxi.Bus.Message;
+using Galaxi.Tickets.Domain.DTOs;
+using Galaxi.Tickets.Domain.IntegrationEvents.Validators;
 using Galaxi.Tickets.Domain.Profiles;
 using Galaxi.Tickets.Domain.Services;
 using Galaxi.Tickets.Persistence;
@@ -19,6 +23,7 @@ var configuration = service.GetService<IConfiguration>();
 
 builder.Services.AddMassTransit(x =>
 {
+    x.AddRequestClient<CheckFunctionSeats>();
     x.UsingAzureServiceBus((context, cfg) =>
     {
         cfg.Host(configuration.GetConnectionString("AzureServiceBus"));
@@ -29,9 +34,12 @@ builder.Services.AddMassTransit(x =>
 
 builder.Services.AddInfrastructure(configuration);
 builder.Services.AddAutoMapper(typeof(TicketProfile).Assembly);
+builder.Services.AddMediatR(Assembly.Load("Galaxi.Tickets.Domain"));
+
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddScoped<ITicketServices, TicketServices>();
-builder.Services.AddMediatR(Assembly.Load("Galaxi.Tickets.Domain"));
+builder.Services.AddScoped<IValidator<TicketDto>, ValidatorAvailableSeats>();
+
 
 // Add Authentication
 var secretKey = Encoding.ASCII.GetBytes(
