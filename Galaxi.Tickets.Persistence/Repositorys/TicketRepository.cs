@@ -27,7 +27,7 @@ namespace Galaxi.Tickets.Persistence.Repositorys
             _context.Update(entity);
         }
 
-        public async Task<Ticket> GetTicketById(int id)
+        public async Task<Ticket> GetTicketById(Guid id)
         {
             var ticket = await _context.Ticket.FirstOrDefaultAsync(u => u.TicketId == id);
             return ticket;
@@ -41,6 +41,11 @@ namespace Galaxi.Tickets.Persistence.Repositorys
         public async Task<bool> SaveAll()
         {
             return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task MigrateAsync()
+        {
+            await _context.Database.MigrateAsync();
         }
     }
 }

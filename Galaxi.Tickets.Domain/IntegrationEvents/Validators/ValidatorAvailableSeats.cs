@@ -20,7 +20,7 @@ namespace Galaxi.Tickets.Domain.IntegrationEvents.Validators
             RuleFor(x => x.NumSeats).NotEmpty().Must(BeAvailable)
                 .WithMessage("there are not enough seats available");
         }
-        private async Task<bool> Exists(int functionId, CancellationToken cancellationToken)
+        private async Task<bool> Exists(Guid functionId, CancellationToken cancellationToken)
         {
             var response = await _client.GetResponse<FunctionStatusSeats>(new CheckFunctionSeats
             {
