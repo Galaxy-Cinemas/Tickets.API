@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace Galaxi.Tickets.Domain.Handlers
 {
     public class GetTicketByIdHandler
-        : IRequestHandler<GetTicketByIdQuery, TicketDto>
+        : IRequestHandler<GetTicketByIdQuery, TicketDetailsDto>
     {
         private readonly ITicketRepository _repo;
         private readonly IMapper _mapper;
@@ -26,12 +26,12 @@ namespace Galaxi.Tickets.Domain.Handlers
             _log = log;
         }
 
-        public async Task<TicketDto> Handle(GetTicketByIdQuery request, CancellationToken cancellationToken)
+        public async Task<TicketDetailsDto> Handle(GetTicketByIdQuery request, CancellationToken cancellationToken)
         {
             try
             {
                 Ticket ticketById = await _repo.GetTicketById(request.ticketId);
-                var ticketByIdViewModel = _mapper.Map<TicketDto>(ticketById);
+                var ticketByIdViewModel = _mapper.Map<TicketDetailsDto>(ticketById);
                 return ticketByIdViewModel;
             }
             catch (Exception ex)

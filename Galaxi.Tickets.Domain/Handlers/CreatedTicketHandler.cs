@@ -17,13 +17,13 @@ namespace Galaxi.Tickets.Domain.Handlers
         private readonly ITicketRepository _repo;
         private readonly IMapper _mapper;
         private readonly IBus _bus;
-        private readonly IValidator<TicketDto> _validatorAvailableSeats;
+        private readonly IValidator<TicketDetailsDto> _validatorAvailableSeats;
 
         public CreatedTicketHandler(
             ITicketRepository repo,
             IMapper mapper,
             IBus bus,
-            IValidator<TicketDto> validatorAvailableSeats
+            IValidator<TicketDetailsDto> validatorAvailableSeats
             )
         {
             _repo = repo;
@@ -33,7 +33,7 @@ namespace Galaxi.Tickets.Domain.Handlers
         }
         public async Task<bool> Handle(CreatedTicketCommand request, CancellationToken cancellationToken)
         {
-            TicketDto requestTicket = _mapper.Map<TicketDto>(request);
+            TicketDetailsDto requestTicket = _mapper.Map<TicketDetailsDto>(request);
 
             var result = await _validatorAvailableSeats.ValidateAsync(requestTicket);
 

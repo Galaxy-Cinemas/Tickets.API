@@ -8,5 +8,5 @@ using System.Threading.Tasks;
 
 namespace Galaxi.Tickets.Domain.Infrastructure.Queries
 {
-    public record GetTicketByIdQuery(Guid ticketId) : IRequest<TicketDto>;
+    public record GetTicketByIdQuery(Guid ticketId) : IRequest<TicketDetailsDto>;
 }
