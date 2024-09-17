@@ -13,6 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Galaxi.Tickets.Domain.Services;
 using System.Net;
+using Galaxi.Tickets.Persistence.Repositorys;
 
 namespace Galaxi.Tickets.API.Controllers
 {
@@ -23,22 +24,34 @@ namespace Galaxi.Tickets.API.Controllers
     {
         private readonly IMediator _mediator;
         private readonly ITicketServices _serviceTicket;
+        private readonly ITicketRepository _repo;
         private readonly ILogger<TicketController> _log;
 
-        public TicketController(ILogger<TicketController> log,  IMediator mediator, ITicketServices serviceTicket)
+        public TicketController(ITicketRepository repo,ILogger<TicketController> log,  IMediator mediator, ITicketServices serviceTicket)
         {
             _mediator = mediator;
             _serviceTicket = serviceTicket;
+            _repo = repo;
             _log = log;
         }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> migrate()
+        {
+            await _repo.MigrateAsync();
+            //var successResponse = ResponseHandler<string>.CreateSuccessResponse("DB has been migrated successfully", null);
+            return Ok();
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             try
             {
-                string Authorization = HttpContext.Request.Headers["Authorization"];
-                TokenUserInfo jwtPayload = _serviceTicket.DeserealizeToken(Authorization);
+                //string Authorization = HttpContext.Request.Headers["Authorization"];
+                //TokenUserInfo jwtPayload = _serviceTicket.DeserealizeToken(Authorization);
                 _log.LogInformation("Get all tickets");
                 var tickets = await _mediator.Send(new GetAllTicketQuery());
                 return Ok(tickets);
@@ -72,7 +85,7 @@ namespace Galaxi.Tickets.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(Guid id)
         {
             try
             {

@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace Galaxi.Tickets.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class updateAdditionalPrice : Migration
+    public partial class addguid : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -18,9 +19,8 @@ namespace Galaxi.Tickets.Persistence.Migrations
                 schema: "DBO",
                 columns: table => new
                 {
-                    TicketId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FunctionId = table.Column<int>(type: "int", nullable: false),
+                    TicketId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FunctionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     AdditionalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NumSeats = table.Column<int>(type: "int", nullable: false)

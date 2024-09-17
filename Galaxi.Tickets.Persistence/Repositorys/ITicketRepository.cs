@@ -6,9 +6,10 @@ namespace Galaxi.Tickets.Persistence.Repositorys
     {
         void Add<T>(T entity) where T : class;
         void Delete<T>(T entity) where T : class;
-        Task<Ticket> GetTicketById(int id);
+        Task<Ticket> GetTicketById(Guid id);
         Task<IEnumerable<Ticket>> GetTicketsAsync();
         Task<bool> SaveAll();
         void Update<T>(T entity) where T : class;
+        Task MigrateAsync();
     }
 }
