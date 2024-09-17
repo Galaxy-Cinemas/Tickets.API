@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Galaxi.Tickets.Domain.Handlers
 {
     public class GetAllTicketsHandler
-         : IRequestHandler<GetAllTicketQuery, IEnumerable<TicketDto>>
+         : IRequestHandler<GetAllTicketQuery, IEnumerable<TicketSummaryDto>>
     {
         private readonly ITicketRepository _repo;
         private readonly IMapper _mapper;
@@ -25,12 +25,12 @@ namespace Galaxi.Tickets.Domain.Handlers
             _mapper = mapper;
             _log = log;
         }
-        public async Task<IEnumerable<TicketDto>> Handle(GetAllTicketQuery request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<TicketSummaryDto>> Handle(GetAllTicketQuery request, CancellationToken cancellationToken)
         {
             try
             {
                 var ticket = await _repo.GetTicketsAsync();
-                var ticketViewModel = _mapper.Map<List<TicketDto>>(ticket);
+                var ticketViewModel = _mapper.Map<List<TicketSummaryDto>>(ticket);
                 return ticketViewModel;
             }
             catch (Exception ex)

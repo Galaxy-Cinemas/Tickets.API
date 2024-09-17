@@ -14,11 +14,12 @@ using System.Text;
 using Galaxi.Tickets.Domain.Services;
 using System.Net;
 using Galaxi.Tickets.Persistence.Repositorys;
+using Galaxi.Tickets.Domain.Response;
 
 namespace Galaxi.Tickets.API.Controllers
 {
-    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    [Route("v1/[controller]/[action]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Route("[action]")]
     [ApiController]
     public class TicketController : ControllerBase
     {
@@ -40,8 +41,8 @@ namespace Galaxi.Tickets.API.Controllers
         public async Task<IActionResult> migrate()
         {
             await _repo.MigrateAsync();
-            //var successResponse = ResponseHandler<string>.CreateSuccessResponse("DB has been migrated successfully", null);
-            return Ok();
+            var successResponse = ResponseHandler<string>.CreateSuccessResponse("DB has been migrated successfully", null);
+            return StatusCode(successResponse.StatusCode.Value, successResponse);
         }
 
 
@@ -50,11 +51,10 @@ namespace Galaxi.Tickets.API.Controllers
         {
             try
             {
-                //string Authorization = HttpContext.Request.Headers["Authorization"];
-                //TokenUserInfo jwtPayload = _serviceTicket.DeserealizeToken(Authorization);
                 _log.LogInformation("Get all tickets");
                 var tickets = await _mediator.Send(new GetAllTicketQuery());
-                return Ok(tickets);
+                var successResponse = ResponseHandler<IEnumerable<TicketSummaryDto>>.CreateSuccessResponse("Tickets retrieved successfully", tickets);
+                return StatusCode(successResponse.StatusCode.Value, successResponse);
             }
             catch (Exception ex)
             {
@@ -63,7 +63,7 @@ namespace Galaxi.Tickets.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreatedTicketCommand ticketToCreate)
+        public async Task<IActionResult> buyTicked(CreatedTicketCommand ticketToCreate)
         {
             string Authorization = HttpContext.Request.Headers["Authorization"];
 
@@ -77,9 +77,11 @@ namespace Galaxi.Tickets.API.Controllers
                 NumSeats: ticketToCreate.NumSeats
                 );
 
-            var created = await _mediator.Send(newCreateTicket);
-            if (created)
-                return Ok(newCreateTicket);
+            var TickedBought = await _mediator.Send(newCreateTicket);
+            if (TickedBought) {
+                var successResponse = ResponseHandler<CreatedTicketCommand>.CreateSuccessResponse("Ticked bought successfully", newCreateTicket);
+                return StatusCode(successResponse.StatusCode.Value, successResponse);
+            }
 
             return BadRequest();
         }
@@ -93,7 +95,8 @@ namespace Galaxi.Tickets.API.Controllers
                     
                 _log.LogInformation("Get ticket {0}", id);
                 var ticket = await _mediator.Send(ticketById);
-                return Ok(ticket);
+                var successResponse = ResponseHandler<TicketDetailsDto>.CreateSuccessResponse("Ticked by id retrieved successfully", ticket);
+                return StatusCode(successResponse.StatusCode.Value, successResponse);
             }
             catch (Exception ex)
             {

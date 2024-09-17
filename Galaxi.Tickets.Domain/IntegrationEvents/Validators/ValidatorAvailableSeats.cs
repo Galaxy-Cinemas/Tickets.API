@@ -5,7 +5,7 @@ using MassTransit;
 
 namespace Galaxi.Tickets.Domain.IntegrationEvents.Validators
 {
-    public class ValidatorAvailableSeats : AbstractValidator<TicketDto>
+    public class ValidatorAvailableSeats : AbstractValidator<TicketDetailsDto>
     {
         //
         private readonly IRequestClient<CheckFunctionSeats> _client;

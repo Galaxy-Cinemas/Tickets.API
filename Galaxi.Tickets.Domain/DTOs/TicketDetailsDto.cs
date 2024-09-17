@@ -1,0 +1,17 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Galaxi.Tickets.Domain.DTOs
+{
+    public class TicketDetailsDto
+    {
+        public Guid TicketId { get; set; }
+        public Guid FunctionId { get; set; }
+        public decimal AdditionalPrice { get; set; } = 0;
+        public string UserName { get; set; }
+        public int NumSeats { get; set; } = 1;
+    }
+}

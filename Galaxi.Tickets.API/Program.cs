@@ -38,7 +38,7 @@ builder.Services.AddMediatR(Assembly.Load("Galaxi.Tickets.Domain"));
 
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddScoped<ITicketServices, TicketServices>();
-builder.Services.AddScoped<IValidator<TicketDto>, ValidatorAvailableSeats>();
+builder.Services.AddScoped<IValidator<TicketDetailsDto>, ValidatorAvailableSeats>();
 
 
 // Add Authentication
