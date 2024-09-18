@@ -21,6 +21,11 @@ var builder = WebApplication.CreateBuilder(args);
 var service = builder.Services.BuildServiceProvider();
 var configuration = service.GetService<IConfiguration>();
 
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("RedisConnection");
+});
+
 builder.Services.AddMassTransit(x =>
 {
     x.AddRequestClient<CheckFunctionSeats>();
@@ -37,8 +42,11 @@ builder.Services.AddAutoMapper(typeof(TicketProfile).Assembly);
 builder.Services.AddMediatR(Assembly.Load("Galaxi.Tickets.Domain"));
 
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
+builder.Services.AddScoped<ICacheRedis, CacheRedis>();
 builder.Services.AddScoped<ITicketServices, TicketServices>();
 builder.Services.AddScoped<IValidator<TicketDetailsDto>, ValidatorAvailableSeats>();
+
+
 
 
 // Add Authentication

@@ -28,7 +28,7 @@ namespace Galaxi.Tickets.Domain.Handlers
 
         public async Task<TicketDetailsDto> Handle(GetTicketByIdQuery request, CancellationToken cancellationToken)
         {
-            Ticket ticketById = await _repo.GetTicketById(request.ticketId);
+            Ticket ticketById = await _repo.GetTicketByIdAsync(request.ticketId);
             if (ticketById == null)
                 throw new KeyNotFoundException();
             
