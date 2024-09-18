@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Galaxi.Tickets.Domain.Handlers
 {
@@ -27,17 +28,13 @@ namespace Galaxi.Tickets.Domain.Handlers
         }
         public async Task<IEnumerable<TicketSummaryDto>> Handle(GetAllTicketQuery request, CancellationToken cancellationToken)
         {
-            try
+            var ticket = await _repo.GetTicketsAsync();
+            if (ticket == null || !ticket.Any())
             {
-                var ticket = await _repo.GetTicketsAsync();
-                var ticketViewModel = _mapper.Map<List<TicketSummaryDto>>(ticket);
-                return ticketViewModel;
+                throw new KeyNotFoundException();
             }
-            catch (Exception ex)
-            {
-                _log.LogError("An exception has occurred getting all tickets {0}", ex.Message);
-                throw;
-            }
+            var ticketViewModel = _mapper.Map<List<TicketSummaryDto>>(ticket);
+            return ticketViewModel;
         }
     }
 }

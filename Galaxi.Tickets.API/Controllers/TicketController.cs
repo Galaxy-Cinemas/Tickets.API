@@ -1,18 +1,11 @@
-﻿using Galaxi.Tickets.Data.Models;
-using Galaxi.Tickets.Domain.DTOs;
+﻿using Galaxi.Tickets.Domain.DTOs;
 using Galaxi.Tickets.Domain.Infrastructure.Commands;
 using Galaxi.Tickets.Domain.Infrastructure.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
-using System.Text.Json;
-using Newtonsoft.Json;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Galaxi.Tickets.Domain.Services;
-using System.Net;
 using Galaxi.Tickets.Persistence.Repositorys;
 using Galaxi.Tickets.Domain.Response;
 
@@ -28,7 +21,7 @@ namespace Galaxi.Tickets.API.Controllers
         private readonly ITicketRepository _repo;
         private readonly ILogger<TicketController> _log;
 
-        public TicketController(ITicketRepository repo,ILogger<TicketController> log,  IMediator mediator, ITicketServices serviceTicket)
+        public TicketController(ITicketRepository repo, ILogger<TicketController> log, IMediator mediator, ITicketServices serviceTicket)
         {
             _mediator = mediator;
             _serviceTicket = serviceTicket;
@@ -41,7 +34,7 @@ namespace Galaxi.Tickets.API.Controllers
         public async Task<IActionResult> migrate()
         {
             await _repo.MigrateAsync();
-            var successResponse = ResponseHandler<string>.CreateSuccessResponse("DB has been migrated successfully", null);
+            var successResponse = ResponseHandler<string>.SuccessResponse("DB has been migrated successfully", null);
             return StatusCode(successResponse.StatusCode.Value, successResponse);
         }
 
@@ -53,37 +46,62 @@ namespace Galaxi.Tickets.API.Controllers
             {
                 _log.LogInformation("Get all tickets");
                 var tickets = await _mediator.Send(new GetAllTicketQuery());
-                var successResponse = ResponseHandler<IEnumerable<TicketSummaryDto>>.CreateSuccessResponse("Tickets retrieved successfully", tickets);
+                var successResponse = ResponseHandler<IEnumerable<TicketSummaryDto>>.SuccessResponse("Tickets retrieved successfully", tickets);
                 return StatusCode(successResponse.StatusCode.Value, successResponse);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _log.LogWarning(ex.Message);
+                var response = ResponseHandler<string>.NotFoundResponse("Ticket not found.", ex.Message);
+                return StatusCode(response.StatusCode.Value, response);
             }
             catch (Exception ex)
             {
-                return BadRequest();
+                _log.LogError(ex, ex.Message);
+                var errorResponse = ResponseHandler<string>.ErrorResponse("An internal server error occurred", ex);
+                return StatusCode(errorResponse.StatusCode.Value, errorResponse);
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> buyTicked(CreatedTicketCommand ticketToCreate)
+        public async Task<IActionResult> BuyTicked(CreatedTicketCommand ticketToCreate)
         {
-            string Authorization = HttpContext.Request.Headers["Authorization"];
+            try
+            {
+                string Authorization = HttpContext.Request.Headers["Authorization"];
 
-            TokenUserInfo jwtPayload = _serviceTicket.DeserealizeToken(Authorization);
+                TokenUserInfo jwtPayload = _serviceTicket.DeserealizeToken(Authorization);
 
-            CreatedTicketCommand newCreateTicket = new CreatedTicketCommand
-                (
-                FunctionId: ticketToCreate.FunctionId,
-                AdditionalPrice: ticketToCreate.AdditionalPrice,
-                UserName: jwtPayload.email,
-                NumSeats: ticketToCreate.NumSeats
-                );
+                CreatedTicketCommand newCreateTicket = new CreatedTicketCommand
+                    (
+                        FunctionId: ticketToCreate.FunctionId,
+                        AdditionalPrice: ticketToCreate.AdditionalPrice,
+                        UserName: jwtPayload.email,
+                        NumSeats: ticketToCreate.NumSeats
+                    );
 
-            var TickedBought = await _mediator.Send(newCreateTicket);
-            if (TickedBought) {
-                var successResponse = ResponseHandler<CreatedTicketCommand>.CreateSuccessResponse("Ticked bought successfully", newCreateTicket);
+                var TickedBought = await _mediator.Send(newCreateTicket);
+                var successResponse = ResponseHandler<CreatedTicketCommand>.SuccessResponse("Ticked bought successfully", newCreateTicket);
                 return StatusCode(successResponse.StatusCode.Value, successResponse);
             }
-
-            return BadRequest();
+            catch (KeyNotFoundException ex)
+            {
+                _log.LogWarning(ex.Message);
+                var response = ResponseHandler<string>.NotFoundResponse("Function not found.", "The Function with the specified ID does not exist.");
+                return StatusCode(response.StatusCode.Value, response);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _log.LogWarning(ex.Message);
+                var errorResponse = ResponseHandler<string>.ErrorResponse("Failed to save changes to the database.", ex);
+                return StatusCode(errorResponse.StatusCode.Value, errorResponse);
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex.Message);
+                var errorResponse = ResponseHandler<string>.ErrorResponse("An internal server error occurred", ex);
+                return StatusCode(errorResponse.StatusCode.Value, errorResponse);
+            }
         }
 
         [HttpGet("{id}")]
@@ -91,16 +109,28 @@ namespace Galaxi.Tickets.API.Controllers
         {
             try
             {
-                GetTicketByIdQuery ticketById = new GetTicketByIdQuery(ticketId:id);
-                    
                 _log.LogInformation("Get ticket {0}", id);
-                var ticket = await _mediator.Send(ticketById);
-                var successResponse = ResponseHandler<TicketDetailsDto>.CreateSuccessResponse("Ticked by id retrieved successfully", ticket);
+                var ticket = await _mediator.Send(new GetTicketByIdQuery(id));
+                var successResponse = ResponseHandler<TicketDetailsDto>.SuccessResponse("Ticked by id retrieved successfully", ticket);
                 return StatusCode(successResponse.StatusCode.Value, successResponse);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _log.LogWarning(ex.Message);
+                var response = ResponseHandler<string>.NotFoundResponse("Ticket not found.", "The Ticket with the specified ID does not exist.");
+                return StatusCode(response.StatusCode.Value, response);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _log.LogWarning(ex.Message);
+                var errorResponse = ResponseHandler<string>.ErrorResponse("Failed to save changes to the database.", ex);
+                return StatusCode(errorResponse.StatusCode.Value, errorResponse);
             }
             catch (Exception ex)
             {
-                return BadRequest();
+                _log.LogError(ex.Message);
+                var errorResponse = ResponseHandler<string>.ErrorResponse("An internal server error occurred", ex);
+                return StatusCode(errorResponse.StatusCode.Value, errorResponse);
             }
         }
     }

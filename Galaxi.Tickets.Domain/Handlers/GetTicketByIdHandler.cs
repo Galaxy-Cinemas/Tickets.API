@@ -28,17 +28,12 @@ namespace Galaxi.Tickets.Domain.Handlers
 
         public async Task<TicketDetailsDto> Handle(GetTicketByIdQuery request, CancellationToken cancellationToken)
         {
-            try
-            {
-                Ticket ticketById = await _repo.GetTicketById(request.ticketId);
-                var ticketByIdViewModel = _mapper.Map<TicketDetailsDto>(ticketById);
-                return ticketByIdViewModel;
-            }
-            catch (Exception ex)
-            {
-                _log.LogError("An exception has occurred getting the ticket {0}", ex.Message);
-                throw;
-            }
+            Ticket ticketById = await _repo.GetTicketById(request.ticketId);
+            if (ticketById == null)
+                throw new KeyNotFoundException();
+            
+            var ticketByIdViewModel = _mapper.Map<TicketDetailsDto>(ticketById);
+            return ticketByIdViewModel;
         }
     }
 }

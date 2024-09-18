@@ -18,7 +18,7 @@ namespace Galaxi.Tickets.Domain.Response
         {
             Errors = new List<string>();
         }
-        public static ResponseHandler<T> CreateNotFoundResponse(string message, string error)
+        public static ResponseHandler<T> NotFoundResponse(string message, string error)
         {
             return new ResponseHandler<T>
             {
@@ -29,7 +29,7 @@ namespace Galaxi.Tickets.Domain.Response
             };
         }
 
-        public static ResponseHandler<T> CreateErrorResponse(string message, Exception ex)
+        public static ResponseHandler<T> ErrorResponse(string message, Exception ex)
         {
             return new ResponseHandler<T>
             {
@@ -39,7 +39,7 @@ namespace Galaxi.Tickets.Domain.Response
                 StatusCode = 500 // InternalServerError
             };
         }
-        public static ResponseHandler<T> CreateErrorResponse(string message, List<string> error)
+        public static ResponseHandler<T> ErrorResponse(string message, List<string> error)
         {
             return new ResponseHandler<T>
             {
@@ -50,7 +50,7 @@ namespace Galaxi.Tickets.Domain.Response
             };
         }
 
-        public static ResponseHandler<T> CreateSuccessResponse(string message, T data)
+        public static ResponseHandler<T> SuccessResponse(string message, T data)
         {
             return new ResponseHandler<T>
             {
