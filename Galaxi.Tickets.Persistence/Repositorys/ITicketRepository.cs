@@ -4,12 +4,14 @@ namespace Galaxi.Tickets.Persistence.Repositorys
 {
     public interface ITicketRepository
     {
-        void Add<T>(T entity) where T : class;
-        void Delete<T>(T entity) where T : class;
-        Task<Ticket> GetTicketById(Guid id);
+
+        Task Add(Ticket ticket);
+        Task Delete(Ticket ticket);
+        Task Update(Ticket ticket);
+
+        Task<Ticket> GetTicketByIdAsync(Guid id);
         Task<IEnumerable<Ticket>> GetTicketsAsync();
         Task<bool> SaveAll();
-        void Update<T>(T entity) where T : class;
         Task MigrateAsync();
     }
 }

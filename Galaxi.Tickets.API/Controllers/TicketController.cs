@@ -38,7 +38,6 @@ namespace Galaxi.Tickets.API.Controllers
             return StatusCode(successResponse.StatusCode.Value, successResponse);
         }
 
-
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -69,7 +68,6 @@ namespace Galaxi.Tickets.API.Controllers
             try
             {
                 string Authorization = HttpContext.Request.Headers["Authorization"];
-
                 TokenUserInfo jwtPayload = _serviceTicket.DeserealizeToken(Authorization);
 
                 CreatedTicketCommand newCreateTicket = new CreatedTicketCommand
