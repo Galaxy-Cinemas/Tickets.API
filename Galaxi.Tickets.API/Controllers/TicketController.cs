@@ -110,7 +110,7 @@ namespace Galaxi.Tickets.API.Controllers
         {
             try
             {
-                _log.LogInformation("Get ticket {0}", id);
+                _log.LogInformation($"Get ticket {id}");
                 var ticket = await _mediator.Send(new GetTicketByIdQuery(id));
                 var successResponse = ResponseHandler<TicketDetailsDto>.SuccessResponse("Ticked by id retrieved successfully", ticket);
                 return StatusCode(successResponse.StatusCode.Value, successResponse);

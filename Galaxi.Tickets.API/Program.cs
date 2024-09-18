@@ -14,12 +14,39 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Serilog.Events;
+using Serilog;
+using Serilog.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var service = builder.Services.BuildServiceProvider();
 var configuration = service.GetService<IConfiguration>();
+
+builder.Services.AddLogging(logginBuilder =>
+{
+    //1. Create Config
+    var loggerConfig = new LoggerConfiguration()
+                           .MinimumLevel.Information()
+                           .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                           .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+                           .WriteTo.File
+                           (
+                                path: "/app/samba/logs/logs-ticket-Serilog-.json",
+                                formatter: new Serilog.Formatting.Json.JsonFormatter(),
+                                rollingInterval: RollingInterval.Day
+                           )
+                           .WriteTo.Http(builder.Configuration.GetConnectionString("LogStash"), null);
+
+    //2. Create Logger
+    var logger = loggerConfig.CreateLogger();
+
+    //3. Inject Service
+    logginBuilder.Services.AddSingleton<ILoggerFactory>(
+        provider => new SerilogLoggerFactory(logger, dispose: false));
+
+});
 
 builder.Services.AddStackExchangeRedisCache(options =>
 {
