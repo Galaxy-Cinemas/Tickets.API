@@ -1,7 +1,6 @@
 ﻿using Galaxi.Tickets.Data.Models;
 using Galaxi.Tickets.Persistence.Persistence;
 using Microsoft.EntityFrameworkCore;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Galaxi.Tickets.Persistence.Repositorys
 {
