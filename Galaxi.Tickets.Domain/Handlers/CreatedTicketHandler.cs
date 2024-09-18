@@ -7,12 +7,11 @@ using Galaxi.Tickets.Domain.Infrastructure.Commands;
 using Galaxi.Tickets.Persistence.Repositorys;
 using MassTransit;
 using MediatR;
-using System.Net.Http;
 
 namespace Galaxi.Tickets.Domain.Handlers
 {
     public class CreatedTicketHandler
-        : IRequestHandler<CreatedTicketCommand, bool>
+        : IRequestHandler<CreatedTicketCommand, TicketDetailsDto>
     {
         private readonly ITicketRepository _repo;
         private readonly IMapper _mapper;
@@ -31,28 +30,31 @@ namespace Galaxi.Tickets.Domain.Handlers
             _bus = bus;
             _validatorAvailableSeats = validatorAvailableSeats;
         }
-        public async Task<bool> Handle(CreatedTicketCommand request, CancellationToken cancellationToken)
+        public async Task<TicketDetailsDto> Handle(CreatedTicketCommand request, CancellationToken cancellationToken)
         {
             TicketDetailsDto requestTicket = _mapper.Map<TicketDetailsDto>(request);
 
             var result = await _validatorAvailableSeats.ValidateAsync(requestTicket);
 
-            if (!result.IsValid) return false;
+            if (!result.IsValid) throw new KeyNotFoundException();
 
-                Ticket createdMovie = _mapper.Map<Ticket>(request);
+            Ticket createdMovie = _mapper.Map<Ticket>(request);
 
             _repo.Add(createdMovie);
 
-            var created = await _repo.SaveAll();
+            var sucess = await _repo.SaveAll();
 
+            if (!sucess) throw new InvalidOperationException();
+            
             await _bus.Publish(new TickedCreated
             {
                 FunctionId = createdMovie.FunctionId,
                 NumSeat = createdMovie.NumSeats,
-                //Email = HttpContext.Request.Headers["Email"]
             });
 
-            return created;
+            var ticketBought = _mapper.Map<TicketDetailsDto>(requestTicket);
+
+            return ticketBought;
         }
     }
 }
