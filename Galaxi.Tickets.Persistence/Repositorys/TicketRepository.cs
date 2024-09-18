@@ -9,7 +9,7 @@ namespace Galaxi.Tickets.Persistence.Repositorys
     {
         private readonly TicketContextDb _context;
         private readonly ICacheRedis _cache;
-        private const string _cacheKeyAllTickets = "all_tickets";
+        private const string _cacheKeyAllTicketsByUser = "all_tickets_";
         private const string _cacheKeyTicket = "ticket_";
         private const string _cacheKeyFunctionById = "ticketByFunctionId_";
 
@@ -22,17 +22,17 @@ namespace Galaxi.Tickets.Persistence.Repositorys
         public async Task Add(Ticket ticket)
         {
             _context.Add(ticket);
-            await _cache.RemoveCacheAsync(_cacheKeyAllTickets, _cacheKeyTicket, _cacheKeyFunctionById, movieId: ticket.TicketId);
+            await _cache.RemoveCacheAsync(_cacheKeyAllTicketsByUser, _cacheKeyTicket, _cacheKeyFunctionById, ticketId: ticket.TicketId);
         }
         public async Task Delete(Ticket ticket)
         {
             _context.Remove(ticket);
-            await _cache.RemoveCacheAsync(_cacheKeyAllTickets, _cacheKeyTicket, _cacheKeyFunctionById, ticket.TicketId, ticket.FunctionId);
+            await _cache.RemoveCacheAsync(_cacheKeyAllTicketsByUser, _cacheKeyTicket, _cacheKeyFunctionById, ticket.TicketId, ticket.FunctionId);
         }
         public async Task Update(Ticket ticket)
         {
             _context.Update(ticket);
-            await _cache.RemoveCacheAsync(_cacheKeyAllTickets, _cacheKeyTicket, _cacheKeyFunctionById, ticket.TicketId, ticket.FunctionId);
+            await _cache.RemoveCacheAsync(_cacheKeyAllTicketsByUser, _cacheKeyTicket, _cacheKeyFunctionById, ticket.TicketId, ticket.FunctionId);
         }
         public async Task<Ticket> GetTicketByIdAsync(Guid ticketId)
         {
@@ -54,22 +54,22 @@ namespace Galaxi.Tickets.Persistence.Repositorys
             }
             return ticket;
         }
-        public async Task<IEnumerable<Ticket>> GetTicketsAsync()
+        public async Task<IEnumerable<Ticket>> GetTicketsByUserAsync(string emailUser)
         {
-            var cacheTickets = await _cache.GetCacheAsync<IEnumerable<Ticket>>(_cacheKeyAllTickets);
+            var cacheKey = $"{_cacheKeyAllTicketsByUser}{emailUser}";
+
+            var cacheTickets = await _cache.GetCacheAsync<IEnumerable<Ticket>>(cacheKey);
 
             if (cacheTickets != null)
             {
                 return cacheTickets;
             }
-            var tickets = await _context.Ticket.ToListAsync();
-            if (tickets != null && tickets.Any())
+            var tickets = _context.Ticket.Where(u => u.UserName == emailUser);
+            if (tickets != null)
             {
-                _ = _cache.SetCacheAsync(tickets, _cacheKeyAllTickets);
+                _ = _cache.SetCacheAsync(tickets, cacheKey);
             }
             return tickets;
-
-
         }
         public async Task<bool> SaveAll()
         {
