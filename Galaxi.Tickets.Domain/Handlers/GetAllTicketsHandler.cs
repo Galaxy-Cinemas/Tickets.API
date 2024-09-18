@@ -4,12 +4,6 @@ using Galaxi.Tickets.Domain.Infrastructure.Queries;
 using Galaxi.Tickets.Persistence.Repositorys;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Galaxi.Tickets.Domain.Handlers
 {
@@ -28,7 +22,7 @@ namespace Galaxi.Tickets.Domain.Handlers
         }
         public async Task<IEnumerable<TicketSummaryDto>> Handle(GetAllTicketQuery request, CancellationToken cancellationToken)
         {
-            var ticket = await _repo.GetTicketsAsync();
+            var ticket = await _repo.GetTicketsByUserAsync(request.email);
             if (ticket == null || !ticket.Any())
             {
                 throw new KeyNotFoundException();

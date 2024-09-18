@@ -39,12 +39,15 @@ namespace Galaxi.Tickets.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAllTicketsByUser()
         {
             try
             {
                 _log.LogInformation("Get all tickets");
-                var tickets = await _mediator.Send(new GetAllTicketQuery());
+                string Authorization = HttpContext.Request.Headers["Authorization"];
+                TokenUserInfo jwtPayload = _serviceTicket.DeserealizeToken(Authorization);
+
+                var tickets = await _mediator.Send(new GetAllTicketQuery(jwtPayload.email));
                 var successResponse = ResponseHandler<IEnumerable<TicketSummaryDto>>.SuccessResponse("Tickets retrieved successfully", tickets);
                 return StatusCode(successResponse.StatusCode.Value, successResponse);
             }

@@ -10,7 +10,7 @@ namespace Galaxi.Tickets.Persistence.Repositorys
         Task Update(Ticket ticket);
 
         Task<Ticket> GetTicketByIdAsync(Guid id);
-        Task<IEnumerable<Ticket>> GetTicketsAsync();
+        Task<IEnumerable<Ticket>> GetTicketsByUserAsync(string emailUser);
         Task<bool> SaveAll();
         Task MigrateAsync();
     }
