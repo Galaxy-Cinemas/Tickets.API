@@ -1,6 +1,7 @@
 ﻿using Galaxi.Tickets.Data.Models;
 using Galaxi.Tickets.Persistence.Persistence;
 using Microsoft.EntityFrameworkCore;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Galaxi.Tickets.Persistence.Repositorys
 {
@@ -21,17 +22,17 @@ namespace Galaxi.Tickets.Persistence.Repositorys
         public async Task Add(Ticket ticket)
         {
             _context.Add(ticket);
-            await _cache.RemoveCacheAsync(_cacheKeyAllTicketsByUser, _cacheKeyTicket, _cacheKeyFunctionById, ticketId: ticket.TicketId);
+            await _cache.RemoveCacheAsync(_cacheKeyTicket, _cacheKeyFunctionById, _cacheKeyAllTicketsByUser, emailUser: ticket.UserName, ticketId: ticket.TicketId);
         }
         public async Task Delete(Ticket ticket)
         {
             _context.Remove(ticket);
-            await _cache.RemoveCacheAsync(_cacheKeyAllTicketsByUser, _cacheKeyTicket, _cacheKeyFunctionById, ticket.TicketId, ticket.FunctionId);
+            await _cache.RemoveCacheAsync(_cacheKeyTicket, _cacheKeyFunctionById, _cacheKeyAllTicketsByUser, ticket.TicketId, ticket.FunctionId);
         }
         public async Task Update(Ticket ticket)
         {
             _context.Update(ticket);
-            await _cache.RemoveCacheAsync(_cacheKeyAllTicketsByUser, _cacheKeyTicket, _cacheKeyFunctionById, ticket.TicketId, ticket.FunctionId);
+            await _cache.RemoveCacheAsync(_cacheKeyTicket, _cacheKeyFunctionById, _cacheKeyAllTicketsByUser, ticket.TicketId, ticket.FunctionId);
         }
         public async Task<Ticket> GetTicketByIdAsync(Guid ticketId)
         {
@@ -64,7 +65,7 @@ namespace Galaxi.Tickets.Persistence.Repositorys
                 return cacheTickets;
             }
             var tickets = _context.Ticket.Where(u => u.UserName == emailUser);
-            if (tickets != null)
+            if (tickets != null && tickets.Any())
             {
                 _ = _cache.SetCacheAsync(tickets, cacheKey);
             }

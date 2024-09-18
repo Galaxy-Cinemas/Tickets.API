@@ -67,7 +67,7 @@ namespace Galaxi.Tickets.Persistence.Repositorys
             }
             return null;
         }
-        public async Task RemoveCacheAsync(string cacheKeyTicket, string cacheKeyTicketById, string cacheKeyAllTickets, Guid? ticketId = null, Guid? functionId = null)
+        public async Task RemoveCacheAsync(string cacheKeyTicket, string cacheKeyTicketById, string cacheKeyAllTickets, Guid? ticketId = null, Guid? functionId = null, string? emailUser = "")
         {
             try
             {
@@ -76,7 +76,7 @@ namespace Galaxi.Tickets.Persistence.Repositorys
                     await Task.WhenAll(
                        _cache.RemoveAsync($"{cacheKeyTicket}{ticketId}"),
                        _cache.RemoveAsync($"{cacheKeyTicketById}{functionId}"),
-                       _cache.RemoveAsync(cacheKeyAllTickets)
+                       _cache.RemoveAsync($"{cacheKeyAllTickets}{emailUser}")
                    );
                 });
             }
