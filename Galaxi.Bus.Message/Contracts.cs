@@ -13,6 +13,7 @@ namespace Galaxi.Bus.Message
         public Guid FunctionId { get; init; }
         public int NumSeat { get; init; }
         public string Email { get; init; }
+        public string UserName { get; init; }
     }
 
     public record CheckFunctionSeats
@@ -25,8 +26,4 @@ namespace Galaxi.Bus.Message
         public bool Exist { get; init; }
         public int NumSeatAvailable { get; init; }
     }
-
-
-
-    
 }
