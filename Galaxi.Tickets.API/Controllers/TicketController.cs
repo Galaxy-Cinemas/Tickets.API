@@ -66,23 +66,24 @@ namespace Galaxi.Tickets.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> BuyTicked(CreatedTicketCommand ticketToCreate)
+        public async Task<IActionResult> BuyTicked(BuyTicketCommand ticketToCreate)
         {
             try
             {
                 string Authorization = HttpContext.Request.Headers["Authorization"];
                 TokenUserInfo jwtPayload = _serviceTicket.DeserealizeToken(Authorization);
 
-                CreatedTicketCommand newCreateTicket = new CreatedTicketCommand
+                BuyTicketCommand newCreateTicket = new BuyTicketCommand
                     (
                         FunctionId: ticketToCreate.FunctionId,
                         AdditionalPrice: ticketToCreate.AdditionalPrice,
-                        UserName: jwtPayload.email,
+                        UserEmail: jwtPayload.email,
+                        UserName: jwtPayload.unique_name + " " + jwtPayload.family_name,
                         NumSeats: ticketToCreate.NumSeats
                     );
 
                 var TickedBought = await _mediator.Send(newCreateTicket);
-                var successResponse = ResponseHandler<CreatedTicketCommand>.SuccessResponse("Ticked bought successfully", newCreateTicket);
+                var successResponse = ResponseHandler<BuyTicketCommand>.SuccessResponse("Ticked bought successfully", newCreateTicket);
                 return StatusCode(successResponse.StatusCode.Value, successResponse);
             }
             catch (KeyNotFoundException ex)

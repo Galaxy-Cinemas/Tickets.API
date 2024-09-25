@@ -9,8 +9,8 @@ namespace Galaxi.Tickets.Domain.Profiles
     {
         public TicketProfile()
         {
-            CreateMap<CreatedTicketCommand, Ticket>();
-            CreateMap<CreatedTicketCommand, TicketDetailsDto>();
+            CreateMap<BuyTicketCommand, Ticket>();
+            CreateMap<BuyTicketCommand, TicketDetailsDto>();
             CreateMap<Ticket, TicketSummaryDto>();
             CreateMap<Ticket, TicketDetailsDto>();
 

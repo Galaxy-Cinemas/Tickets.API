@@ -10,15 +10,15 @@ using MediatR;
 
 namespace Galaxi.Tickets.Domain.Handlers
 {
-    public class CreatedTicketHandler
-        : IRequestHandler<CreatedTicketCommand, TicketDetailsDto>
+    public class BuyTicketHandler
+        : IRequestHandler<BuyTicketCommand, TicketDetailsDto>
     {
         private readonly ITicketRepository _repo;
         private readonly IMapper _mapper;
         private readonly IBus _bus;
         private readonly IValidator<TicketDetailsDto> _validatorAvailableSeats;
 
-        public CreatedTicketHandler(
+        public BuyTicketHandler(
             ITicketRepository repo,
             IMapper mapper,
             IBus bus,
@@ -30,7 +30,7 @@ namespace Galaxi.Tickets.Domain.Handlers
             _bus = bus;
             _validatorAvailableSeats = validatorAvailableSeats;
         }
-        public async Task<TicketDetailsDto> Handle(CreatedTicketCommand request, CancellationToken cancellationToken)
+        public async Task<TicketDetailsDto> Handle(BuyTicketCommand request, CancellationToken cancellationToken)
         {
             TicketDetailsDto requestTicket = _mapper.Map<TicketDetailsDto>(request);
 
@@ -50,6 +50,8 @@ namespace Galaxi.Tickets.Domain.Handlers
             {
                 FunctionId = createdMovie.FunctionId,
                 NumSeat = createdMovie.NumSeats,
+                Email = createdMovie.UserEmail,
+                UserName = createdMovie.UserName
             });
 
             var ticketBought = _mapper.Map<TicketDetailsDto>(requestTicket);
