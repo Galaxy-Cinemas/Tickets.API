@@ -7,20 +7,20 @@ using Microsoft.Extensions.Logging;
 
 namespace Galaxi.Tickets.Domain.Handlers
 {
-    public class GetAllTicketsHandler
-         : IRequestHandler<GetAllTicketQuery, IEnumerable<TicketSummaryDto>>
+    public class GetAllTicketsByUserEmailHandler
+         : IRequestHandler<GetAllTicketsByUserEmailQuery, IEnumerable<TicketSummaryDto>>
     {
         private readonly ITicketRepository _repo;
         private readonly IMapper _mapper;
-        private readonly ILogger<GetAllTicketsHandler> _log;
+        private readonly ILogger<GetAllTicketsByUserEmailHandler> _log;
 
-        public GetAllTicketsHandler(ITicketRepository repo, IMapper mapper, ILogger<GetAllTicketsHandler> log)
+        public GetAllTicketsByUserEmailHandler(ITicketRepository repo, IMapper mapper, ILogger<GetAllTicketsByUserEmailHandler> log)
         {
             _repo = repo;
             _mapper = mapper;
             _log = log;
         }
-        public async Task<IEnumerable<TicketSummaryDto>> Handle(GetAllTicketQuery request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<TicketSummaryDto>> Handle(GetAllTicketsByUserEmailQuery request, CancellationToken cancellationToken)
         {
             var ticket = await _repo.GetTicketsByUserAsync(request.email);
             if (ticket == null || !ticket.Any())
