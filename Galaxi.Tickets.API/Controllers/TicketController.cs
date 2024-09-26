@@ -47,7 +47,7 @@ namespace Galaxi.Tickets.API.Controllers
                 string Authorization = HttpContext.Request.Headers["Authorization"];
                 TokenUserInfo jwtPayload = _serviceTicket.DeserealizeToken(Authorization);
 
-                var tickets = await _mediator.Send(new GetAllTicketQuery(jwtPayload.email));
+                var tickets = await _mediator.Send(new GetAllTicketsByUserEmailQuery(jwtPayload.email));
                 var successResponse = ResponseHandler<IEnumerable<TicketSummaryDto>>.SuccessResponse("Tickets retrieved successfully", tickets);
                 return StatusCode(successResponse.StatusCode.Value, successResponse);
             }

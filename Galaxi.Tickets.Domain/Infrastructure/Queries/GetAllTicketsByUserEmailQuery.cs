@@ -3,5 +3,5 @@ using MediatR;
 
 namespace Galaxi.Tickets.Domain.Infrastructure.Queries
 {
-    public record GetAllTicketQuery(string email) : IRequest<IEnumerable<TicketSummaryDto>>;
+    public record GetAllTicketsByUserEmailQuery(string email) : IRequest<IEnumerable<TicketSummaryDto>>;
 }

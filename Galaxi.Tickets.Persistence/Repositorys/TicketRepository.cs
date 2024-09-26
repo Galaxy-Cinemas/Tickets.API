@@ -64,7 +64,7 @@ namespace Galaxi.Tickets.Persistence.Repositorys
             {
                 return cacheTickets;
             }
-            var tickets = _context.Ticket.Where(u => u.UserName == emailUser);
+            var tickets = _context.Ticket.Where(u => u.UserEmail == emailUser);
             if (tickets != null && tickets.Any())
             {
                 _ = _cache.SetCacheAsync(tickets, cacheKey);
